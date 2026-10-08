@@ -24,6 +24,5 @@ Du kan også redigere fila direkte på github.com: åpne fila, klikk blyanten og
 ## Greit å vite
 
 - Siden er offentlig. Ikke legg inn pasientopplysninger, navn eller annet internt.
-- Avkrysninger lagres bare i nettleseren til den som krysser av, og deles ikke med andre.
-- Hvis du endrer teksten på en oppgave, forsvinner avkrysningen for den oppgaven.
+- Siden er bare til visning. Alle endringer gjøres i `oppgaver.js`.
 - Du kan åpne `index.html` direkte fra mappa for å se endringer før du pusher.

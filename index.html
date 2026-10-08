@@ -135,6 +135,7 @@ h3{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
 .mdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:1px}
 .empty{color:var(--muted);font-size:14px;margin:0}
 .sec+.sec{margin-top:16px}
+.bullet{flex:none;width:8px;height:8px;border-radius:50%;margin-top:7px;margin-inline:6px}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -144,7 +145,7 @@ h3{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
   <header>
     <div>
       <h1 id="title">Ort årshjul</h1>
-      <p class="sub">Klikk på en måned for å se oppgavene. Avkrysninger lagres i din nettleser.</p>
+      <p class="sub">Klikk på en måned for å se oppgavene og fristene.</p>
     </div>
     <div class="hctl">
       <div class="year" aria-label="Velg år">
@@ -161,8 +162,7 @@ h3{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
         <svg id="wheel" viewBox="0 0 600 600" role="group" aria-label="Årshjul med tolv måneder"></svg>
         <div class="legend">
           <span><i style="background:var(--ink);height:4px;border-radius:2px;vertical-align:2px"></i>Denne måneden</span>
-          <span><i style="border:1.8px solid var(--muted);border-radius:50%"></i>Oppgave</span>
-          <span><i style="background:var(--muted);border-radius:50%"></i>Gjort</span>
+          <span><i style="border:1.8px solid var(--muted);border-radius:50%"></i>Én prikk per oppgave</span>
         </div>
       </div>
       <section class="card">
@@ -172,7 +172,6 @@ h3{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
     <div class="col">
       <section class="card month" id="monthCard">
         <div class="mhead"><h2 id="mName"></h2><span class="pill" id="mNow" hidden>Denne måneden</span></div>
-        <div class="prog"><div id="mBar"></div></div>
         <div class="progt" id="mProg"></div>
         <ul class="tasks" id="mTasks"></ul>
         <div class="nav">
@@ -180,7 +179,6 @@ h3{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
           <button class="btn" id="nextM">Neste måned ›</button>
         </div>
       </section>
-      <div class="foot"><span id="yearSum"></span><button class="btn" id="reset">Nullstill mine avkrysninger for året</button></div>
     </div>
   </div>
 </div>
@@ -208,11 +206,6 @@ const tasks=(typeof OPPGAVER!=="undefined"?OPPGAVER:[]).map(o=>{
 });
 if(typeof TITTEL!=="undefined"){$("title").textContent=TITTEL;document.title=TITTEL;}
 
-const KEY="arshjul-avkrysning";
-let checks={};try{checks=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(checks))}catch(e){}};
-const ck=(y,id)=>y+"_"+id;
-const isDone=(y,id)=>!!checks[ck(y,id)];
 const monthTasks=m=>tasks.filter(t=>t.month===m);
 const hasFrist=t=>t.fristDay!=null;
 const fristDate=(t,y)=>new Date(y,t.fristMonth,t.fristDay);
@@ -226,73 +219,68 @@ function drawWheel(){
   const svg=$("wheel");svg.innerHTML="";const R_OUT=272,R_IN=150,R_CEN=138;
   for(let m=0;m<12;m++){
     const a0=m*30+.7,a1=(m+1)*30-.7,isSel=m===sel,isCur=m===curMonth&&year===curYear;
-    const list=monthTasks(m),dn=list.filter(t=>isDone(year,t.id)).length;
-    const g=el("g",{class:"seg",tabindex:"0",role:"button","aria-label":`${MONTHS[m]}, ${dn} av ${list.length} gjort`,"aria-pressed":String(isSel)},svg);
+    const list=monthTasks(m);
+    const g=el("g",{class:"seg",tabindex:"0",role:"button","aria-label":`${MONTHS[m]}, ${list.length} oppgaver`,"aria-pressed":String(isSel)},svg);
     el("path",{class:"m",d:arc(R_IN,isSel?R_OUT+12:R_OUT,a0,a1),fill:css("--m"+m),stroke:isSel?css("--ink"):"none","stroke-width":isSel?3:0,"stroke-linejoin":"round"},g);
     if(isCur)el("path",{d:arc(R_OUT+(isSel?18:6),R_OUT+(isSel?25:13),a0+3,a1-3),fill:css("--ink")},g);
     const mid=(a0+a1)/2,rot=(mid>90&&mid<270)?mid+180:mid,[lx,ly]=pt(R_OUT-32,mid);
     el("text",{x:lx,y:ly,"text-anchor":"middle","dominant-baseline":"central",transform:`rotate(${rot} ${lx} ${ly})`,fill:"#fff","font-size":"19","font-weight":"700","letter-spacing":"1.5","font-family":FONT},g).textContent=SHORT[m];
     const n=list.length,spread=Math.min(6.5,24/Math.max(n,1)),r=n>5?4.5:6;
-    list.forEach((t,i)=>{const [dx,dy]=pt(R_IN+34,mid+(i-(n-1)/2)*spread),d=isDone(year,t.id);
-      el("circle",{cx:dx,cy:dy,r,fill:d?"#fff":"none",stroke:"#fff","stroke-width":"1.8",opacity:d?1:.8},g);});
+    list.forEach((t,i)=>{const [dx,dy]=pt(R_IN+34,mid+(i-(n-1)/2)*spread);
+      el("circle",{cx:dx,cy:dy,r,fill:"none",stroke:"#fff","stroke-width":"1.8",opacity:.85},g);});
     g.addEventListener("click",()=>select(m));
     g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(m);}});
   }
   el("circle",{cx:C,cy:C,r:R_CEN,fill:css("--m"+sel)},svg);
-  const tot=tasks.length,dn=tasks.filter(t=>isDone(year,t.id)).length,cr=R_CEN-12,circ=2*Math.PI*cr;
+  const tot=tasks.length,cr=R_CEN-12;
   el("circle",{cx:C,cy:C,r:cr,fill:"none",stroke:"rgba(255,255,255,.22)","stroke-width":"5"},svg);
-  if(dn&&tot)el("circle",{cx:C,cy:C,r:cr,fill:"none",stroke:"#fff","stroke-width":"5","stroke-linecap":"round","stroke-dasharray":`${circ*dn/tot} ${circ}`,transform:`rotate(-90 ${C} ${C})`},svg);
   const words=($("title").textContent||"Årshjul").split(" ");
   const l1=words.length>1?words.slice(0,-1).join(" "):"",l2=words[words.length-1];
   if(l1)el("text",{x:C,y:C-24,"text-anchor":"middle",fill:"#fff","font-size":"40","font-weight":"600","font-family":FONT},svg).textContent=l1;
   el("text",{x:C,y:l1?C+20:C+8,"text-anchor":"middle",fill:"#fff","font-size":"40","font-weight":"600","font-family":FONT},svg).textContent=l2;
-  el("text",{x:C,y:C+56,"text-anchor":"middle",fill:"#fff",opacity:.9,"font-size":"14","font-family":"IBM Plex Mono, monospace"},svg).textContent=`${dn}/${tot} gjort · ${year}`;
+  el("text",{x:C,y:C+56,"text-anchor":"middle",fill:"#fff",opacity:.9,"font-size":"14","font-family":"IBM Plex Mono, monospace"},svg).textContent=`${tot} oppgaver · ${year}`;
 }
 const checkSvg=`<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5l2.5 2.5L10 3.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 function renderMonth(){
   document.documentElement.style.setProperty("--sel",`var(--m${sel})`);
   $("mName").textContent=`${MONTHS[sel]} ${year}`;$("mNow").hidden=!(sel===curMonth&&year===curYear);
-  const list=monthTasks(sel),d=list.filter(t=>isDone(year,t.id)).length;
-  $("mBar").style.width=(list.length?100*d/list.length:0)+"%";$("mProg").textContent=`${d} av ${list.length} gjort`;
+  const list=monthTasks(sel);
+  $("mProg").textContent=`${list.length} oppgave${list.length===1?"":"r"}`;
   $("mTasks").innerHTML=list.length?list.map(t=>{
-    const dn=isDone(year,t.id),open=openId===t.id,hasDet=t.owner||t.note||t.links.length;
+    const open=openId===t.id,hasDet=t.owner||t.note||t.links.length;
     const f=hasFrist(t)?`<span class="frist">frist ${pad(t.fristDay)}.${pad(t.fristMonth+1)}</span>`:"";
     const det=open?`<div class="det">
       ${t.owner?`<div><div class="lbl">Ansvarlig</div>${esc(t.owner)}</div>`:""}
       ${t.note?`<div><div class="lbl">Notat</div><p>${esc(t.note)}</p></div>`:""}
       ${t.links.length?`<div><div class="lbl">Lenker</div><ul>${t.links.map(l=>`<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tittel||l.url)}</a></li>`).join("")}</ul></div>`:""}
     </div>`:"";
-    return `<li class="task${dn?" done":""}${open?" open":""}"><div class="row">
-      <label class="chk"><input type="checkbox" data-id="${t.id}" ${dn?"checked":""} aria-label="${esc(t.text)}"><span class="box">${checkSvg}</span></label>
+    return `<li class="task${open?" open":""}"><div class="row">
+      <span class="bullet" style="background:var(--sel)"></span>
       ${hasDet?`<button class="tt" data-open="${t.id}" aria-expanded="${open}"><span class="ttx">${esc(t.text)}</span>${f}<span class="ico">${open?"▾":"▸"}</span></button>`:`<span class="tt"><span class="ttx">${esc(t.text)}</span>${f}</span>`}
       ${t.owner?`<span class="who">${esc(t.owner)}</span>`:""}
     </div>${det}</li>`;}).join(""):`<li><p class="empty" style="padding:8px">Ingen oppgaver denne måneden.</p></li>`;
-  $("mTasks").querySelectorAll("input").forEach(i=>i.onchange=()=>{const k=ck(year,i.dataset.id);if(i.checked)checks[k]=1;else delete checks[k];save();render();});
   $("mTasks").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{openId=openId===b.dataset.open?null:b.dataset.open;renderMonth();});
 }
 const dstr=d=>`${pad(d.getDate())}.${pad(d.getMonth()+1)}.${String(d.getFullYear()).slice(2)}`;
 function renderLists(){
   const end=new Date(T0);end.setDate(end.getDate()+56);const ag=[],soon=[];
   tasks.forEach(t=>{if(!hasFrist(t))return;let y=curYear,dt=fristDate(t,y);if(dt<T0){y++;dt=fristDate(t,y);}
-    const days=Math.round((dt-T0)/864e5),done=isDone(y,t.id);if(dt<=end)ag.push({dt,t,y,days,done});if(!done&&days<=14)soon.push(t);});
+    const days=Math.round((dt-T0)/864e5);if(dt<=end)ag.push({dt,t,y,days});if(days<=14)soon.push(t);});
   for(let k=1;k<=2;k++){const ms=new Date(curYear,curMonth+k,1);const n=monthTasks(ms.getMonth()).length;
     if(ms<=end&&n)ag.push({dt:ms,ms:1,m:ms.getMonth(),y:ms.getFullYear(),n,days:Math.round((ms-T0)/864e5)});}
   ag.sort((a,b)=>a.dt-b.dt);
   $("agenda").innerHTML=ag.length?ag.map(x=>x.ms
     ?`<li class="ms"><button data-y="${x.y}" data-m="${x.m}"><span class="d">${dstr(x.dt)}</span><span class="n"><i class="mdot" style="background:var(--m${x.m})"></i>${MONTHS[x.m]} starter · ${x.n} oppgave${x.n>1?"r":""}</span><span class="left">om ${x.days} d</span></button></li>`
-    :`<li class="${x.done?"ok":(x.days<=14?"soon":"")}"><button data-y="${x.y}" data-m="${x.t.month}"><span class="d">${dstr(x.dt)}</span><span class="n"><i class="mdot" style="background:var(--m${x.t.month})"></i>Frist: ${esc(x.t.text)}</span><span class="left">${x.done?"gjort":(x.days===0?"i dag":`om ${x.days} d`)}</span></button></li>`).join(""):`<li><p class="empty">Ingen frister de neste 8 ukene.</p></li>`;
+    :`<li class="${x.days<=14?"soon":""}"><button data-y="${x.y}" data-m="${x.t.month}"><span class="d">${dstr(x.dt)}</span><span class="n"><i class="mdot" style="background:var(--m${x.t.month})"></i>Frist: ${esc(x.t.text)}</span><span class="left">${x.days===0?"i dag":`om ${x.days} d`}</span></button></li>`).join(""):`<li><p class="empty">Ingen frister de neste 8 ukene.</p></li>`;
   document.querySelectorAll(".dl button").forEach(b=>b.onclick=()=>{year=+b.dataset.y;select(+b.dataset.m);});
   $("banner").innerHTML=soon.length?`<button class="soon" id="soonB">${soon.length} frist${soon.length>1?"er":""} innen 14 dager: ${soon.map(t=>esc(t.text)).join(", ")}</button>`:"";
   if(soon.length)$("soonB").onclick=()=>select(soon[0].month);
 }
 function render(){drawWheel();renderMonth();renderLists();
-  const dn=tasks.filter(t=>isDone(year,t.id)).length;$("yearSum").textContent=`${year}: ${dn} av ${tasks.length} oppgaver gjort`;$("yearLbl").textContent=year;}
+  $("yearLbl").textContent=year;}
 function select(m){sel=((m%12)+12)%12;openId=null;render();}
 $("prevM").onclick=()=>{if(sel===0)year--;select(sel-1)};$("nextM").onclick=()=>{if(sel===11)year++;select(sel+1)};
 $("prevY").onclick=()=>{year--;render()};$("nextY").onclick=()=>{year++;render()};
-const rb=$("reset");let armT;rb.onclick=()=>{
-  if(!rb.classList.contains("arm")){rb.classList.add("arm");rb.textContent=`Klikk igjen for å nullstille ${year}`;clearTimeout(armT);armT=setTimeout(()=>{rb.classList.remove("arm");rb.textContent="Nullstill mine avkrysninger for året"},4000);return;}
-  Object.keys(checks).forEach(k=>{if(k.startsWith(year+"_"))delete checks[k]});save();rb.classList.remove("arm");rb.textContent="Nullstill mine avkrysninger for året";render();};
 matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",drawWheel);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawWheel);
 render();
