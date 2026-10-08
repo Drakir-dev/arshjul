@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ort årshjul</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#eef1ee; --surface:#ffffff; --surface-2:#f6f8f6; --ink:#1d2621; --muted:#5d6b63; --line:#d5ddd7;
+  --accent:#2f5d8c; --sel:#56809f; --done:#3c7a55; --warn:#b5651d; --bad:#b0413e; --chip:#e4eae6;
+  --warn-bg:#f8ecdf; --bad-bg:#f6e3e2;
+  --m0:#56809f;--m1:#5f6f98;--m2:#4f8a86;--m3:#5c8f72;--m4:#7a9259;--m5:#ad925c;--m6:#b8875e;--m7:#b0705f;--m8:#a2616c;--m9:#8c6581;--m10:#716a95;--m11:#5a7090;
+  --sans:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#141a17; --surface:#1d2521; --surface-2:#232c27; --ink:#e7ece9; --muted:#9aa89f; --line:#2e3833;
+  --accent:#7fb0e0; --done:#6cc08e; --warn:#e3a062; --bad:#e58a86; --chip:#26302b;
+  --warn-bg:#3a2c1f; --bad-bg:#3a2324;
+  --m0:#4a7090;--m1:#53618a;--m2:#447a77;--m3:#4f7e64;--m4:#6a804d;--m5:#98804f;--m6:#a07551;--m7:#9a6152;--m8:#8e545e;--m9:#7a5870;--m10:#625c83;--m11:#4e627e;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#141a17; --surface:#1d2521; --surface-2:#232c27; --ink:#e7ece9; --muted:#9aa89f; --line:#2e3833;
+  --accent:#7fb0e0; --done:#6cc08e; --warn:#e3a062; --bad:#e58a86; --chip:#26302b;
+  --warn-bg:#3a2c1f; --bad-bg:#3a2324;
+  --m0:#4a7090;--m1:#53618a;--m2:#447a77;--m3:#4f7e64;--m4:#6a804d;--m5:#98804f;--m6:#a07551;--m7:#9a6152;--m8:#8e545e;--m9:#7a5870;--m10:#625c83;--m11:#4e627e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:16px;padding-block:24px 48px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:16px}
+h1{font-size:28px;font-weight:700;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0}
+.hctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.year{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.year span{font-size:18px;min-width:3.2em;text-align:center;font-weight:500}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.ib{background:var(--surface);border:1px solid var(--line);border-radius:8px;width:34px;height:34px;display:grid;place-items:center;font-size:16px}
+.ib:hover{border-color:var(--muted)}
+.tog{background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:14px}
+.tog[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.banner{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.banner button{border:0;border-radius:10px;padding:8px 14px;font-size:14px;text-align:left}
+.banner .soon{background:var(--warn-bg);color:var(--warn)}
+.banner .late{background:var(--bad-bg);color:var(--bad)}
+.banner .ok{background:var(--chip);color:var(--muted);cursor:default}
+.notice{background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px 14px;color:var(--muted);font-size:14px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.wheelbox{padding:16px}
+svg#wheel{display:block;width:100%;height:auto;max-width:540px;margin:0 auto}
+.seg{cursor:pointer}
+.seg:hover path.m{filter:brightness(1.08)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;margin-top:12px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
+.card.month{border-top:6px solid var(--sel)}
+.mhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mhead h2{margin:0;font-size:24px;font-weight:700;color:var(--sel)}
+.pill{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;padding:3px 9px;border-radius:99px;color:#fff;background:var(--sel)}
+.prog{height:6px;background:var(--chip);border-radius:99px;margin:14px 0 6px;overflow:hidden}
+.prog>div{height:100%;background:var(--sel);border-radius:99px;transition:width .25s}
+.progt{font-size:13px;color:var(--muted);font-family:var(--mono)}
+ul.tasks{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.task{border-radius:10px}
+.task.open{background:var(--surface-2)}
+.row{display:flex;align-items:flex-start;gap:10px;padding:8px 8px}
+.chk{display:flex;padding-top:2px;cursor:pointer}
+.chk input{position:absolute;opacity:0;width:1px;height:1px}
+.box{flex:none;width:20px;height:20px;border:2px solid var(--muted);border-radius:6px;display:grid;place-items:center}
+.box svg{width:12px;height:12px;opacity:0}
+.chk input:checked+.box{background:var(--sel);border-color:var(--sel)}
+.chk input:checked+.box svg{opacity:1}
+.chk input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
+.chk input:disabled+.box{opacity:.5;cursor:not-allowed}
+.tt{flex:1;min-width:0;text-align:left;background:none;border:0;padding:0;line-height:1.45}
+.tt:hover .ttx{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.task.done .ttx{color:var(--muted);text-decoration:line-through}
+.frist{display:inline-block;margin-left:6px;font-family:var(--mono);font-size:12px;padding:1px 7px;border-radius:6px;background:var(--chip);color:var(--warn);white-space:nowrap}
+.ico{display:inline-block;margin-left:6px;font-size:12px;color:var(--muted)}
+.who{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);white-space:nowrap;max-width:40%;overflow:hidden;text-overflow:ellipsis}
+.who img{width:20px;height:20px;border-radius:50%;flex:none}
+.det{padding:0 12px 12px 38px;display:flex;flex-direction:column;gap:10px;font-size:14px}
+.det .lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:2px}
+.det p{margin:0;white-space:pre-wrap}
+.det ul{margin:0;padding-left:18px}
+.det a{color:var(--accent)}
+.meta{font-size:13px;color:var(--muted)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:14px}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.arm{border-color:var(--bad);color:var(--bad)}
+.nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.add{margin-top:8px;background:none;border:1px dashed var(--line);border-radius:10px;padding:9px 12px;width:100%;text-align:left;color:var(--muted)}
+.add:hover{border-color:var(--muted);color:var(--ink)}
+form.ed{display:flex;flex-direction:column;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);margin:6px 0}
+.f{display:flex;flex-direction:column;gap:4px}
+.f label,.f .lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.f input,.f select,.f textarea{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+.f textarea{min-height:70px;resize:vertical}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.f2{grid-template-columns:1fr}}
+.hint{font-size:12px;color:var(--muted)}
+.err{font-size:13px;color:var(--bad)}
+.picker{position:relative}
+.sugg{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;list-style:none;padding:4px;z-index:5;box-shadow:0 6px 20px rgba(0,0,0,.12);max-height:240px;overflow:auto}
+.sugg button{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;padding:6px 8px;border-radius:6px;text-align:left}
+.sugg button:hover,.sugg button:focus-visible{background:var(--chip)}
+.sugg img{width:22px;height:22px;border-radius:50%}
+.chosen{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.chosen img{width:22px;height:22px;border-radius:50%}
+.chosen button{margin-left:auto;background:none;border:0;color:var(--muted);font-size:16px}
+.linkrow{display:grid;grid-template-columns:1fr 1.4fr auto;gap:6px}
+@media (max-width:480px){.linkrow{grid-template-columns:1fr}}
+.linkrow button{background:none;border:1px solid var(--line);border-radius:8px;padding:0 10px;color:var(--muted)}
+h3{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.dl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.dl li+li{border-top:1px solid var(--line)}
+.dl button{display:grid;grid-template-columns:5.2em 1fr auto;gap:12px;align-items:baseline;width:100%;padding:9px 2px;background:none;border:0;text-align:left}
+.dl button:hover .n{text-decoration:underline;text-underline-offset:3px}
+.dl .d{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px}
+.dl .left{font-size:12px;font-family:var(--mono);color:var(--muted);white-space:nowrap}
+.dl .soon .left{color:var(--warn);font-weight:500}
+.dl .late .left{color:var(--bad);font-weight:500}
+.dl .ok .left{color:var(--done)}
+.dl .ms .n{color:var(--muted)}
+.mdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:1px}
+.empty{color:var(--muted);font-size:14px;margin:0}
+.sec+.sec{margin-top:16px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 id="title">Ort årshjul</h1>
+      <p class="sub">Klikk på en måned for å se oppgavene. Avkrysninger lagres i din nettleser.</p>
+    </div>
+    <div class="hctl">
+      <div class="year" aria-label="Velg år">
+        <button class="ib" id="prevY" aria-label="Forrige år">‹</button>
+        <span id="yearLbl">2026</span>
+        <button class="ib" id="nextY" aria-label="Neste år">›</button>
+      </div>
+    </div>
+  </header>
+  <div class="banner" id="banner"></div>
+  <div class="grid">
+    <div class="col">
+      <div class="card wheelbox">
+        <svg id="wheel" viewBox="0 0 600 600" role="group" aria-label="Årshjul med tolv måneder"></svg>
+        <div class="legend">
+          <span><i style="background:var(--ink);height:4px;border-radius:2px;vertical-align:2px"></i>Denne måneden</span>
+          <span><i style="border:1.8px solid var(--muted);border-radius:50%"></i>Oppgave</span>
+          <span><i style="background:var(--muted);border-radius:50%"></i>Gjort</span>
+        </div>
+      </div>
+      <section class="card">
+        <div class="sec"><h3>De neste 8 ukene</h3><ul class="dl" id="agenda"></ul></div>
+      </section>
+    </div>
+    <div class="col">
+      <section class="card month" id="monthCard">
+        <div class="mhead"><h2 id="mName"></h2><span class="pill" id="mNow" hidden>Denne måneden</span></div>
+        <div class="prog"><div id="mBar"></div></div>
+        <div class="progt" id="mProg"></div>
+        <ul class="tasks" id="mTasks"></ul>
+        <div class="nav">
+          <button class="btn" id="prevM">‹ Forrige måned</button>
+          <button class="btn" id="nextM">Neste måned ›</button>
+        </div>
+      </section>
+      <div class="foot"><span id="yearSum"></span><button class="btn" id="reset">Nullstill mine avkrysninger for året</button></div>
+    </div>
+  </div>
+</div>
+<script src="oppgaver.js"></script>
+<script>
+const MONTHS=["Januar","Februar","Mars","April","Mai","Juni","Juli","August","September","Oktober","November","Desember"];
+const SHORT=["JAN","FEB","MAR","APR","MAI","JUN","JUL","AUG","SEP","OKT","NOV","DES"];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const safeUrl=u=>/^https?:\/\//i.test(u||"")?u:null;
+const today=new Date(),T0=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+const curMonth=today.getMonth(),curYear=today.getFullYear();
+let year=curYear,sel=curMonth,openId=null;
+
+// stabil id per oppgave (måned + tekst), så avkrysninger overlever omrokkering
+const hash=s=>{let h=5381;for(const c of s)h=((h<<5)+h+c.codePointAt(0))|0;return (h>>>0).toString(36)};
+const seen={};
+const tasks=(typeof OPPGAVER!=="undefined"?OPPGAVER:[]).map(o=>{
+  const month=Math.min(12,Math.max(1,+o.maned||1))-1;
+  let id=hash(month+"|"+(o.tekst||""));seen[id]=(seen[id]||0)+1;if(seen[id]>1)id+="-"+seen[id];
+  const m=String(o.frist||"").match(/^(\d{1,2})\.(\d{1,2})/);
+  return {id,month,text:o.tekst||"",fristDay:m?+m[1]:null,fristMonth:m?+m[2]-1:null,owner:o.ansvarlig||"",note:o.notat||"",links:(o.lenker||[]).filter(l=>safeUrl(l.url))};
+});
+if(typeof TITTEL!=="undefined"){$("title").textContent=TITTEL;document.title=TITTEL;}
+
+const KEY="arshjul-avkrysning";
+let checks={};try{checks=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(checks))}catch(e){}};
+const ck=(y,id)=>y+"_"+id;
+const isDone=(y,id)=>!!checks[ck(y,id)];
+const monthTasks=m=>tasks.filter(t=>t.month===m);
+const hasFrist=t=>t.fristDay!=null;
+const fristDate=(t,y)=>new Date(y,t.fristMonth,t.fristDay);
+
+const C=300,NS="http://www.w3.org/2000/svg",FONT="Schibsted Grotesk, system-ui, sans-serif";
+const pt=(r,a)=>{const rad=(a-90)*Math.PI/180;return[C+r*Math.cos(rad),C+r*Math.sin(rad)]};
+function arc(r0,r1,a0,a1){const [x0,y0]=pt(r1,a0),[x1,y1]=pt(r1,a1),[x2,y2]=pt(r0,a1),[x3,y3]=pt(r0,a0);
+  return `M${x0} ${y0}A${r1} ${r1} 0 0 1 ${x1} ${y1}L${x2} ${y2}A${r0} ${r0} 0 0 0 ${x3} ${y3}Z`;}
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function drawWheel(){
+  const svg=$("wheel");svg.innerHTML="";const R_OUT=272,R_IN=150,R_CEN=138;
+  for(let m=0;m<12;m++){
+    const a0=m*30+.7,a1=(m+1)*30-.7,isSel=m===sel,isCur=m===curMonth&&year===curYear;
+    const list=monthTasks(m),dn=list.filter(t=>isDone(year,t.id)).length;
+    const g=el("g",{class:"seg",tabindex:"0",role:"button","aria-label":`${MONTHS[m]}, ${dn} av ${list.length} gjort`,"aria-pressed":String(isSel)},svg);
+    el("path",{class:"m",d:arc(R_IN,isSel?R_OUT+12:R_OUT,a0,a1),fill:css("--m"+m),stroke:isSel?css("--ink"):"none","stroke-width":isSel?3:0,"stroke-linejoin":"round"},g);
+    if(isCur)el("path",{d:arc(R_OUT+(isSel?18:6),R_OUT+(isSel?25:13),a0+3,a1-3),fill:css("--ink")},g);
+    const mid=(a0+a1)/2,rot=(mid>90&&mid<270)?mid+180:mid,[lx,ly]=pt(R_OUT-32,mid);
+    el("text",{x:lx,y:ly,"text-anchor":"middle","dominant-baseline":"central",transform:`rotate(${rot} ${lx} ${ly})`,fill:"#fff","font-size":"19","font-weight":"700","letter-spacing":"1.5","font-family":FONT},g).textContent=SHORT[m];
+    const n=list.length,spread=Math.min(6.5,24/Math.max(n,1)),r=n>5?4.5:6;
+    list.forEach((t,i)=>{const [dx,dy]=pt(R_IN+34,mid+(i-(n-1)/2)*spread),d=isDone(year,t.id);
+      el("circle",{cx:dx,cy:dy,r,fill:d?"#fff":"none",stroke:"#fff","stroke-width":"1.8",opacity:d?1:.8},g);});
+    g.addEventListener("click",()=>select(m));
+    g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(m);}});
+  }
+  el("circle",{cx:C,cy:C,r:R_CEN,fill:css("--m"+sel)},svg);
+  const tot=tasks.length,dn=tasks.filter(t=>isDone(year,t.id)).length,cr=R_CEN-12,circ=2*Math.PI*cr;
+  el("circle",{cx:C,cy:C,r:cr,fill:"none",stroke:"rgba(255,255,255,.22)","stroke-width":"5"},svg);
+  if(dn&&tot)el("circle",{cx:C,cy:C,r:cr,fill:"none",stroke:"#fff","stroke-width":"5","stroke-linecap":"round","stroke-dasharray":`${circ*dn/tot} ${circ}`,transform:`rotate(-90 ${C} ${C})`},svg);
+  const words=($("title").textContent||"Årshjul").split(" ");
+  const l1=words.length>1?words.slice(0,-1).join(" "):"",l2=words[words.length-1];
+  if(l1)el("text",{x:C,y:C-24,"text-anchor":"middle",fill:"#fff","font-size":"40","font-weight":"600","font-family":FONT},svg).textContent=l1;
+  el("text",{x:C,y:l1?C+20:C+8,"text-anchor":"middle",fill:"#fff","font-size":"40","font-weight":"600","font-family":FONT},svg).textContent=l2;
+  el("text",{x:C,y:C+56,"text-anchor":"middle",fill:"#fff",opacity:.9,"font-size":"14","font-family":"IBM Plex Mono, monospace"},svg).textContent=`${dn}/${tot} gjort · ${year}`;
+}
+const checkSvg=`<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5l2.5 2.5L10 3.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function renderMonth(){
+  document.documentElement.style.setProperty("--sel",`var(--m${sel})`);
+  $("mName").textContent=`${MONTHS[sel]} ${year}`;$("mNow").hidden=!(sel===curMonth&&year===curYear);
+  const list=monthTasks(sel),d=list.filter(t=>isDone(year,t.id)).length;
+  $("mBar").style.width=(list.length?100*d/list.length:0)+"%";$("mProg").textContent=`${d} av ${list.length} gjort`;
+  $("mTasks").innerHTML=list.length?list.map(t=>{
+    const dn=isDone(year,t.id),open=openId===t.id,hasDet=t.owner||t.note||t.links.length;
+    const f=hasFrist(t)?`<span class="frist">frist ${pad(t.fristDay)}.${pad(t.fristMonth+1)}</span>`:"";
+    const det=open?`<div class="det">
+      ${t.owner?`<div><div class="lbl">Ansvarlig</div>${esc(t.owner)}</div>`:""}
+      ${t.note?`<div><div class="lbl">Notat</div><p>${esc(t.note)}</p></div>`:""}
+      ${t.links.length?`<div><div class="lbl">Lenker</div><ul>${t.links.map(l=>`<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.tittel||l.url)}</a></li>`).join("")}</ul></div>`:""}
+    </div>`:"";
+    return `<li class="task${dn?" done":""}${open?" open":""}"><div class="row">
+      <label class="chk"><input type="checkbox" data-id="${t.id}" ${dn?"checked":""} aria-label="${esc(t.text)}"><span class="box">${checkSvg}</span></label>
+      ${hasDet?`<button class="tt" data-open="${t.id}" aria-expanded="${open}"><span class="ttx">${esc(t.text)}</span>${f}<span class="ico">${open?"▾":"▸"}</span></button>`:`<span class="tt"><span class="ttx">${esc(t.text)}</span>${f}</span>`}
+      ${t.owner?`<span class="who">${esc(t.owner)}</span>`:""}
+    </div>${det}</li>`;}).join(""):`<li><p class="empty" style="padding:8px">Ingen oppgaver denne måneden.</p></li>`;
+  $("mTasks").querySelectorAll("input").forEach(i=>i.onchange=()=>{const k=ck(year,i.dataset.id);if(i.checked)checks[k]=1;else delete checks[k];save();render();});
+  $("mTasks").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{openId=openId===b.dataset.open?null:b.dataset.open;renderMonth();});
+}
+const dstr=d=>`${pad(d.getDate())}.${pad(d.getMonth()+1)}.${String(d.getFullYear()).slice(2)}`;
+function renderLists(){
+  const end=new Date(T0);end.setDate(end.getDate()+56);const ag=[],soon=[];
+  tasks.forEach(t=>{if(!hasFrist(t))return;let y=curYear,dt=fristDate(t,y);if(dt<T0){y++;dt=fristDate(t,y);}
+    const days=Math.round((dt-T0)/864e5),done=isDone(y,t.id);if(dt<=end)ag.push({dt,t,y,days,done});if(!done&&days<=14)soon.push(t);});
+  for(let k=1;k<=2;k++){const ms=new Date(curYear,curMonth+k,1);const n=monthTasks(ms.getMonth()).length;
+    if(ms<=end&&n)ag.push({dt:ms,ms:1,m:ms.getMonth(),y:ms.getFullYear(),n,days:Math.round((ms-T0)/864e5)});}
+  ag.sort((a,b)=>a.dt-b.dt);
+  $("agenda").innerHTML=ag.length?ag.map(x=>x.ms
+    ?`<li class="ms"><button data-y="${x.y}" data-m="${x.m}"><span class="d">${dstr(x.dt)}</span><span class="n"><i class="mdot" style="background:var(--m${x.m})"></i>${MONTHS[x.m]} starter · ${x.n} oppgave${x.n>1?"r":""}</span><span class="left">om ${x.days} d</span></button></li>`
+    :`<li class="${x.done?"ok":(x.days<=14?"soon":"")}"><button data-y="${x.y}" data-m="${x.t.month}"><span class="d">${dstr(x.dt)}</span><span class="n"><i class="mdot" style="background:var(--m${x.t.month})"></i>Frist: ${esc(x.t.text)}</span><span class="left">${x.done?"gjort":(x.days===0?"i dag":`om ${x.days} d`)}</span></button></li>`).join(""):`<li><p class="empty">Ingen frister de neste 8 ukene.</p></li>`;
+  document.querySelectorAll(".dl button").forEach(b=>b.onclick=()=>{year=+b.dataset.y;select(+b.dataset.m);});
+  $("banner").innerHTML=soon.length?`<button class="soon" id="soonB">${soon.length} frist${soon.length>1?"er":""} innen 14 dager: ${soon.map(t=>esc(t.text)).join(", ")}</button>`:"";
+  if(soon.length)$("soonB").onclick=()=>select(soon[0].month);
+}
+function render(){drawWheel();renderMonth();renderLists();
+  const dn=tasks.filter(t=>isDone(year,t.id)).length;$("yearSum").textContent=`${year}: ${dn} av ${tasks.length} oppgaver gjort`;$("yearLbl").textContent=year;}
+function select(m){sel=((m%12)+12)%12;openId=null;render();}
+$("prevM").onclick=()=>{if(sel===0)year--;select(sel-1)};$("nextM").onclick=()=>{if(sel===11)year++;select(sel+1)};
+$("prevY").onclick=()=>{year--;render()};$("nextY").onclick=()=>{year++;render()};
+const rb=$("reset");let armT;rb.onclick=()=>{
+  if(!rb.classList.contains("arm")){rb.classList.add("arm");rb.textContent=`Klikk igjen for å nullstille ${year}`;clearTimeout(armT);armT=setTimeout(()=>{rb.classList.remove("arm");rb.textContent="Nullstill mine avkrysninger for året"},4000);return;}
+  Object.keys(checks).forEach(k=>{if(k.startsWith(year+"_"))delete checks[k]});save();rb.classList.remove("arm");rb.textContent="Nullstill mine avkrysninger for året";render();};
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",drawWheel);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawWheel);
+render();
+</script>
+</body>
+</html>
